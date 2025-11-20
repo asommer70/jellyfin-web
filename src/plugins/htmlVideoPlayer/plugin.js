@@ -397,6 +397,7 @@ export class HtmlVideoPlayer {
         this.#started = false;
         this.#timeUpdated = false;
 
+        console.log('play() ... this:', this);
         this.#currentTime = null;
 
         if (options.resetSubtitleOffset !== false) this.resetSubtitleOffset();

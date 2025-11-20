@@ -39,6 +39,7 @@ export function enableHlsJsPlayerForCodecs(mediaSource, mediaType) {
 }
 
 export function enableHlsJsPlayer(runTimeTicks, mediaType) {
+    console.log('enagleHlsJsPlayer() ................');
     if (window.MediaSource == null) {
         return false;
     }

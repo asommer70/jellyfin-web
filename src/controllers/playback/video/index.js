@@ -929,6 +929,75 @@ export default function (view) {
         }
     }
 
+    function clip() {
+        console.log('currentPlayer:', currentPlayer);
+        console.log('this:', this);
+        //const playerEl = document.getElementById('videoOsdPage');
+        let playerEl = document.querySelectorAll('#videoOsdPage');
+        if (playerEl.length > 1) {
+            playerEl = playerEl[playerEl.length - 1];
+        }
+
+        if (currentPlayer.clipStart == undefined) {
+            currentPlayer.clipStart = currentPlayer.currentTime();
+            //const currentTime = currentPlayer.currentTime();
+            this.style.color = 'green';
+            //this.children[0].style.color = 'green';
+            this.setAttribute('title', 'Clip End');
+        }
+
+        if (currentPlayer.clipEnd == undefined && currentPlayer.currentTime() > currentPlayer.clipStart) {
+            currentPlayer.clipEnd = currentPlayer.currentTime();
+            //const currentTime = currentPlayer.currentTime();
+            this.style.color = 'red';
+            //this.children[0].style.color = 'red';
+            this.setAttribute('title', 'Save Clip');
+            //this.children[0].classList = ['xlargePaperIconButton material-icons save'];
+
+            console.log('Saving clip...');
+            console.log('currentPlayer.clipStart:', currentPlayer.clipStart, 'currentPlayer.clipEnd:', currentPlayer.clipEnd);
+            console.log('currentPlayer.duration:', currentPlayer.duration());
+
+            // Add a marker to the timeline for the new clip.
+            //const slider = playerEl.querySelector('input.osdPositionSlider.mdl-slider.mdl-js-slider.mdl-slider-hoverthumb');
+            //const sliderMarkerContainer = slider.previousSibling.previousElementSibling;
+            const sliderMarkerContainer = playerEl.querySelector('.sliderMarkerContainer');
+            const markerStart = document.createElement('span');
+            //markerStart.style.left = currentPlayer.clipStart;
+            markerStart.style.left = `${(currentPlayer.clipStart / currentPlayer.duration()) * 100}%`;
+            markerStart.style.setProperty('color', 'green', 'important');
+            markerStart.classList = ['sliderMarker watched'];
+
+            const markerEnd = document.createElement('span');
+            markerEnd.style.left = `${(currentPlayer.clipEnd / currentPlayer.duration()) * 100}%`;
+            markerEnd.style.setProperty('color', 'red', 'important');
+            markerEnd.classList = ['sliderMarker watched'];
+            //<span class="sliderMarker watched" aria-hidden="true" style="left: 98.6905px;"></span>
+
+            sliderMarkerContainer.append(markerStart);
+            sliderMarkerContainer.append(markerEnd);
+
+            console.log('sliderMarkerContainer.children.length:', sliderMarkerContainer.children.length);
+
+            // Use a prompt to enter a description for the clip.
+            const desc = prompt('Clip Description?');
+
+            // TODO: send the new clip to the database.
+        }
+
+        const state = playbackManager.getPlayerState(currentPlayer);
+        const playState = state.PlayState;
+        //console.log('playState:', playState);
+        const nowPlayingItem = state.NowPlayingItem;
+        //console.log('nowPlayingItem:', nowPlayingItem);
+
+        // TODO: maybe change the individual clip to an array of clip objects containing the start, end, and description.
+
+        // TODO: Reset the clipStart and clipEnd.
+
+        // TODO: figure out how to create the clip from the original video.
+    }
+
     function updateTimeText(elem, ticks, divider) {
         if (ticks == null) {
             elem.innerHTML = '';
@@ -1776,6 +1845,8 @@ export default function (view) {
         playbackManager.toggleAirPlay(currentPlayer);
     });
     view.querySelector('.btnVideoOsdSettings').addEventListener('click', onSettingsButtonClick);
+    view.querySelector('.btnClipStart').addEventListener('click', clip);
+
     view.addEventListener('viewhide', function () {
         headerElement.classList.remove('hide');
     });
